@@ -15,11 +15,99 @@ import java.util.Random;
 
 public class FrmOrdenacion extends javax.swing.JFrame {
     private ArrayList<Integer> listaNumeros = new ArrayList<>();
+    
+    private ArrayList<Integer> mezclaDirecta(ArrayList<Integer> lista) {
+        logProceso("Iniciando Mezcla Directa...");
+        if (lista.size() <= 1) {
+            return lista;
+        }
+
+        int medio = lista.size() / 2;
+
+        ArrayList<Integer> izquierda = new ArrayList<>(lista.subList(0, medio));
+        ArrayList<Integer> derecha = new ArrayList<>(lista.subList(medio, lista.size()));
+
+        logProceso("División en: " + izquierda + " y " + derecha);
+
+        izquierda = mezclaDirecta(izquierda);
+        derecha = mezclaDirecta(derecha);
+
+        ArrayList<Integer> resultado = fusionar(izquierda, derecha);
+
+        logProceso("Fusión: " + resultado);
+
+        return resultado;
+    }
+
+    private ArrayList<Integer> fusionar(ArrayList<Integer> izquierda, ArrayList<Integer> derecha) {
+        ArrayList<Integer> resultado = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < izquierda.size() && j < derecha.size()) {
+            if (izquierda.get(i) <= derecha.get(j)) {
+                resultado.add(izquierda.get(i));
+                i++;
+            } else {
+                resultado.add(derecha.get(j));
+                j++;
+            }
+        }
+
+        while (i < izquierda.size()) {
+            resultado.add(izquierda.get(i));
+            i++;
+        }
+        while (j < derecha.size()) {
+            resultado.add(derecha.get(j));
+            j++;
+        }
+
+        return resultado;
+    }
+    
+    private ArrayList<Integer> fusionNatural(ArrayList<Integer> lista) {
+        logProceso("Iniciando Fusión Natural...");
+
+        ArrayList<ArrayList<Integer>> runs = new ArrayList<>();
+
+        ArrayList<Integer> actual = new ArrayList<>();
+        actual.add(lista.get(0));
+
+        for (int i = 1; i < lista.size(); i++) {
+            if (lista.get(i) >= lista.get(i - 1)) {
+                actual.add(lista.get(i));
+            } else {
+                runs.add(new ArrayList<>(actual));
+                actual.clear();
+                actual.add(lista.get(i));
+            }
+        }
+        runs.add(actual);
+
+        logProceso("Subsecuencias iniciales: " + runs);
+
+        while (runs.size() > 1) {
+            ArrayList<Integer> izquierda = runs.remove(0);
+            ArrayList<Integer> derecha = runs.remove(0);
+            ArrayList<Integer> fusion = fusionar(izquierda, derecha);
+
+            logProceso("Fusión: " + izquierda + " + " + derecha + " => " + fusion);
+
+            runs.add(fusion);
+        }
+
+        return runs.get(0);
+    }
+
     /**
      * Creates new form FrmOrdenacion
      */
     public FrmOrdenacion() {
         initComponents();
+    }
+    
+    private void logProceso(String mensaje) {
+        txtProceso.append(mensaje + "\n");
     }
 
     /**
@@ -68,6 +156,11 @@ public class FrmOrdenacion extends javax.swing.JFrame {
         cmbAlgoritmo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mezcla Directa", "Fusión Natural" }));
 
         btnOrdenar.setText("Ordenar");
+        btnOrdenar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOrdenarActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Proceso de ordenación");
 
@@ -80,34 +173,35 @@ public class FrmOrdenacion extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(176, 176, 176))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnOrdenar)
+                        .addGap(206, 206, 206))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(cmbAlgoritmo, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(147, 147, 147))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(189, 189, 189))))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(60, 60, 60)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(33, 33, 33)
-                                .addComponent(jLabel3))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(117, 117, 117)
-                        .addComponent(btnOrdenar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(60, 60, 60)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(cmbAlgoritmo, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGap(34, 34, 34)
-                                    .addComponent(jLabel2)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(109, 109, 109)
+                        .addGap(200, 200, 200)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addComponent(btnCargar)))
-                .addContainerGap(75, Short.MAX_VALUE))
+                        .addGap(158, 158, 158)
+                        .addComponent(btnCargar))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(60, 60, 60)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1))))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -150,6 +244,27 @@ public class FrmOrdenacion extends javax.swing.JFrame {
         txtNumeros.setText(listaNumeros.toString());
         txtProceso.setText("Se han generado 15 números aleatorios.\n");
     }//GEN-LAST:event_btnCargarActionPerformed
+
+    private void btnOrdenarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrdenarActionPerformed
+        // TODO add your handling code here:
+        if (listaNumeros.isEmpty()) {
+            txtProceso.setText("Primero cargue los números aleatorios.\n");
+            return;
+        }
+
+        txtProceso.setText(""); 
+
+        ArrayList<Integer> listaOrdenada = new ArrayList<>();
+        String algoritmo = cmbAlgoritmo.getSelectedItem().toString();
+
+        if (algoritmo.equals("Mezcla Directa")) {
+            listaOrdenada = mezclaDirecta(new ArrayList<>(listaNumeros));
+        } else if (algoritmo.equals("Fusión Natural")) {
+            listaOrdenada = fusionNatural(new ArrayList<>(listaNumeros));
+        }
+
+        txtProceso.append("Resultado final: " + listaOrdenada + "\n");
+    }//GEN-LAST:event_btnOrdenarActionPerformed
 
     /**
      * @param args the command line arguments
