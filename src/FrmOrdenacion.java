@@ -10,7 +10,7 @@
  */
 import java.util.ArrayList;
 import java.util.Random;
-
+import java.util.Collections;
 
 
 public class FrmOrdenacion extends javax.swing.JFrame {
@@ -98,7 +98,57 @@ public class FrmOrdenacion extends javax.swing.JFrame {
 
         return runs.get(0);
     }
+    
+    private ArrayList<Integer> mezclaEquilibradaMultiple(ArrayList<Integer> lista) {
+        logProceso("Iniciando Mezcla Equilibrada Múltiple...");
 
+        int partes = 3; 
+        ArrayList<ArrayList<Integer>> segmentos = new ArrayList<>();
+
+        int tam = lista.size() / partes;
+        for (int i = 0; i < lista.size(); i += tam) {
+            int fin = Math.min(i + tam, lista.size());
+            ArrayList<Integer> sublista = new ArrayList<>(lista.subList(i, fin));
+            Collections.sort(sublista); 
+            segmentos.add(sublista);
+            logProceso("Segmento ordenado: " + sublista);
+        }
+
+        ArrayList<Integer> resultado = new ArrayList<>();
+        for (ArrayList<Integer> seg : segmentos) {
+            resultado.addAll(seg);
+        }
+        Collections.sort(resultado);
+
+        logProceso("Resultado final: " + resultado);
+        return resultado;
+    }
+
+    private ArrayList<Integer> metodoPolifasico(ArrayList<Integer> lista) {
+        logProceso("Iniciando Método Polifásico...");
+
+        ArrayList<ArrayList<Integer>> runs = new ArrayList<>();
+
+        int i = 0;
+        while (i < lista.size()) {
+            int tamCorrida = Math.min((i % 5) + 3, lista.size() - i); 
+            ArrayList<Integer> corrida = new ArrayList<>(lista.subList(i, i + tamCorrida));
+            Collections.sort(corrida);
+            runs.add(corrida);
+            logProceso("Corrida creada: " + corrida);
+            i += tamCorrida;
+        }
+
+        while (runs.size() > 1) {
+            ArrayList<Integer> a = runs.remove(0);
+            ArrayList<Integer> b = runs.remove(0);
+            ArrayList<Integer> fusion = fusionar(a, b);
+            logProceso("Fusionando: " + a + " + " + b + " => " + fusion);
+            runs.add(fusion);
+        }
+
+        return runs.get(0);
+    }
     /**
      * Creates new form FrmOrdenacion
      */
@@ -153,7 +203,7 @@ public class FrmOrdenacion extends javax.swing.JFrame {
 
         jLabel2.setText("Seleccione Algoritmo");
 
-        cmbAlgoritmo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mezcla Directa", "Fusión Natural" }));
+        cmbAlgoritmo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mezcla Directa", "Fusión Natural", "Mezcla Equilibrada Múltiple", "Método Polifásico" }));
 
         btnOrdenar.setText("Ordenar");
         btnOrdenar.addActionListener(new java.awt.event.ActionListener() {
@@ -255,12 +305,16 @@ public class FrmOrdenacion extends javax.swing.JFrame {
         txtProceso.setText(""); 
 
         ArrayList<Integer> listaOrdenada = new ArrayList<>();
+        
         String algoritmo = cmbAlgoritmo.getSelectedItem().toString();
-
         if (algoritmo.equals("Mezcla Directa")) {
             listaOrdenada = mezclaDirecta(new ArrayList<>(listaNumeros));
         } else if (algoritmo.equals("Fusión Natural")) {
             listaOrdenada = fusionNatural(new ArrayList<>(listaNumeros));
+        } else if (algoritmo.equals("Mezcla Equilibrada Múltiple")) {
+            listaOrdenada = mezclaEquilibradaMultiple(new ArrayList<>(listaNumeros));
+        } else if (algoritmo.equals("Método Polifásico")) {
+            listaOrdenada = metodoPolifasico(new ArrayList<>(listaNumeros));
         }
 
         txtProceso.append("Resultado final: " + listaOrdenada + "\n");

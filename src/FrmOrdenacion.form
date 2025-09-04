@@ -131,9 +131,11 @@
     <Component class="javax.swing.JComboBox" name="cmbAlgoritmo">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="2">
+          <StringArray count="4">
             <StringItem index="0" value="Mezcla Directa"/>
             <StringItem index="1" value="Fusi&#xf3;n Natural"/>
+            <StringItem index="2" value="Mezcla Equilibrada M&#xfa;ltiple"/>
+            <StringItem index="3" value="M&#xe9;todo Polif&#xe1;sico"/>
           </StringArray>
         </Property>
       </Properties>
